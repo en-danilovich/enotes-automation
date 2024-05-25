@@ -16,17 +16,17 @@ export default defineConfig({
   expect: {
     timeout: 5000,
   },
-  fullyParallel: true,
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 1 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [["html", { open: "never" }], ["allure-playwright"]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://127.0.0.1:3000',
+    baseURL: "https://enotes.pointschool.ru",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -34,18 +34,28 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
+      name: "setup",
+      testMatch: /setup\.ts/,
+    },
+    {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "storageStates/auth/testUser.json",
+      },
+      dependencies: ["setup"],
     },
 
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"] },
+      dependencies: ["setup"],
     },
 
     {
       name: "webkit",
       use: { ...devices["Desktop Safari"] },
+      dependencies: ["setup"],
     },
   ],
 
