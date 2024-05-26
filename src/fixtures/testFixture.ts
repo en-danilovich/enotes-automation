@@ -4,12 +4,8 @@ import {
   test as base,
   expect,
 } from "@playwright/test";
-import { MainPage } from "../pages/main/Main.page";
 
-export const test = base.extend<
-  { apiToken: string },
-  { enotesContext: BrowserContext }
->({
+export const test = base.extend<{}, { enotesContext: BrowserContext }>({
   enotesContext: [
     async ({ browser }, use) => {
       const context = await browser.newContext({
@@ -21,23 +17,23 @@ export const test = base.extend<
     { scope: "worker" },
   ],
 
-  page: async ({ enotesContext }, use) => {
-    const page = await enotesContext.newPage();
-    await page.goto("/");
+  // page: async ({ enotesContext }, use) => {
+  //   const page = await enotesContext.newPage();
+  //   await page.goto("/");
 
-    const mainPage = new MainPage(page);
-    await mainPage.waitForPageToBeVisible();
+  //   const mainPage = new MainPage(page);
+  //   await mainPage.waitForPageToBeVisible();
 
-    await use(page);
+  //   await use(page);
 
-    page.close();
-  },
+  //   page.close();
+  // },
 
-  apiToken: async ({ page }, use) => {
-    const metaToken = page.locator('meta[name="csrf-token"]');
-    await expect(metaToken).toHaveAttribute("content");
-    const token = await metaToken.getAttribute("content");
-    await expect(token).not.toBeNull();
-    await use(token!);
-  },
+  // apiToken: async ({ page }, use) => {
+  //   const metaToken = page.locator('meta[name="csrf-token"]');
+  //   await expect(metaToken).toHaveAttribute("content");
+  //   const token = await metaToken.getAttribute("content");
+  //   await expect(token).not.toBeNull();
+  //   await use(token!);
+  // },
 });

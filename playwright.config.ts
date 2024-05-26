@@ -29,6 +29,7 @@ export default defineConfig({
     baseURL: "https://enotes.pointschool.ru",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
+    navigationTimeout: 2000,
   },
 
   /* Configure projects for major browsers */

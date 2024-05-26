@@ -1,34 +1,66 @@
 import { test } from "../../../src/fixtures/testFixture";
 import { BasketApiClient } from "../../../src/restApi/enotes/BasketApiClient";
-import { MainPage } from "../../../src/pages/main/Main.page";
-import { expect } from "@playwright/test";
-import { BasketPage } from "../../../src/pages/main/Basket.page";
+import { Page } from "@playwright/test";
+import { TokenHelper } from "../../../src/restApi/enotes/TokenHelper";
+import { Steps } from "../../../src/steps/Steps";
 
-// let basketApiClient;
-// let page;
+let page: Page;
+let basketApiClient: BasketApiClient;
+let steps: Steps;
 
-test.beforeEach(async ({ enotesContext, apiToken }) => {
-  let basketApiClient = new BasketApiClient(enotesContext, apiToken);
+test.beforeAll(async ({ enotesContext }) => {
+  page = await enotesContext.newPage();
+  basketApiClient = new BasketApiClient(enotesContext, new TokenHelper(page));
+  steps = new Steps(page);
+});
+
+test.beforeEach(async () => {
+  await page.goto("./");
   await basketApiClient.clearBasket();
+  await page.reload({ waitUntil: "domcontentloaded" });
+  // TODO wait until get basket response
+  await page.waitForSelector(".basket-count-items", {
+    state: "visible",
+    timeout: 5000,
+  });
 });
 
 test.describe("Basket navigation", () => {
-  test("Open empty basket", async ({ page }) => {
-    const mainPage = new MainPage(page);
+  test("Open empty basket", async () => {
+    await steps.mainSteps.openBasketPopup();
+    await steps.mainSteps.verifyBasketPopupVisible();
 
-    const basketPopup = await mainPage.openBasketPopup();
-    await basketPopup.verifyBasketVisible();
-
-    await basketPopup.openBasket();
-    const basketPage = new BasketPage(page);
-    basketPage.verifyPageVisible();
+    await steps.mainSteps.clickGoToBasket();
+    await steps.basketSteps.verifyBasketPageVisible();
   });
 
-  // TODO change test name
-  test("Open basket with 1 non discount item", async ({ page }) => {
-    // 1. Добавить в корзину один товар без скидки	Рядом с корзиной отображается цифра 1
-    // 2. Нажать на иконку корзины	Открывается окно корзины, в котором указана цена, наименование товара, общая сумма
-    // 3. В окне корзины нажать кнопку перейти в корзину	Переход на страницу корзины
-    await page.waitForLoadState();
+  test("Open basket with 1 non discount item", async () => {
+    const productWithoutDiscount =
+      await steps.mainSteps.findProductWithoutDiscount();
+    const cardProductModel = await steps.mainSteps.buyProduct(
+      productWithoutDiscount
+    );
+    await steps.mainSteps.verifyBasketProductsCount(1);
+
+    await steps.mainSteps.openBasketPopup();
+    await steps.mainSteps.verifyBasketProducts([cardProductModel]);
+
+    await steps.mainSteps.clickGoToBasket();
+    await steps.basketSteps.verifyBasketPageVisible();
+  });
+
+  test("Open basket with 1 discount item", async () => {
+    const productWithoutDiscount =
+      await steps.mainSteps.findProductWithoutDiscount();
+    const cardProductModel = await steps.mainSteps.buyProduct(
+      productWithoutDiscount
+    );
+    await steps.mainSteps.verifyBasketProductsCount(1);
+
+    await steps.mainSteps.openBasketPopup();
+    await steps.mainSteps.verifyBasketProducts([cardProductModel]);
+
+    await steps.mainSteps.clickGoToBasket();
+    await steps.basketSteps.verifyBasketPageVisible();
   });
 });

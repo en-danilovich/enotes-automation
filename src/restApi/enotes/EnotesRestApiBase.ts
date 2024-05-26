@@ -1,20 +1,26 @@
 import { APIResponse, BrowserContext } from "@playwright/test";
-import { RestAPiBase } from "../RestApiBase";
+import { RestApiBase } from "../RestApiBase";
+import { TokenHelper } from "./TokenHelper";
 
-export class EnotesRestApiBase extends RestAPiBase {
-  readonly header: {
+export class EnotesRestApiBase extends RestApiBase {
+  protected header: {
     accept: string;
-    "X-Csrf-Token": string;
     "X-Requested-With": string;
   };
 
-  constructor(browserContext: BrowserContext, token: string) {
+  readonly tokenHelper: TokenHelper;
+
+  constructor(browserContext: BrowserContext, tokenHelper: TokenHelper) {
     super(browserContext);
+    this.tokenHelper = tokenHelper;
     this.header = {
       accept: "application/json, text/javascript, */*; q=0.01",
-      "X-Csrf-Token": token,
       "X-Requested-With": "XMLHttpRequest",
     };
+  }
+
+  getHeaders(token: string) {
+    return { ...this.header, "X-Csrf-Token": token };
   }
 
   async validateResponse(resp: APIResponse) {
