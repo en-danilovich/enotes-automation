@@ -5,3 +5,4 @@ node_modules/
 /playwright/.cache/
 /tests-examples/
 /allure-results/
+/storageStates/

@@ -3,6 +3,7 @@ import { BasketApiClient } from "../../../src/restApi/enotes/BasketApiClient";
 import { Page } from "@playwright/test";
 import { TokenHelper } from "../../../src/restApi/enotes/TokenHelper";
 import { Steps } from "../../../src/steps/Steps";
+import { MainPage } from "../../../src/pages/main/Main.page";
 
 let page: Page;
 let basketApiClient: BasketApiClient;
@@ -35,8 +36,7 @@ test.describe("Basket navigation", () => {
   });
 
   test("Open basket with 1 non discount item", async () => {
-    const productWithoutDiscount =
-      await steps.mainSteps.findProductWithoutDiscount();
+    const productWithoutDiscount = await steps.mainSteps.findProduct(false);
     const cardProductModel = await steps.mainSteps.buyProduct(
       productWithoutDiscount
     );
@@ -50,12 +50,31 @@ test.describe("Basket navigation", () => {
   });
 
   test("Open basket with 1 discount item", async () => {
-    const productWithoutDiscount =
-      await steps.mainSteps.findProductWithoutDiscount();
-    const cardProductModel = await steps.mainSteps.buyProduct(
-      productWithoutDiscount
-    );
+    await steps.mainSteps.setDiscountFilter(true);
+    const discountProduct = await steps.mainSteps.findProduct(true);
+    const cardProductModel = await steps.mainSteps.buyProduct(discountProduct);
     await steps.mainSteps.verifyBasketProductsCount(1);
+
+    await steps.mainSteps.openBasketPopup();
+    await steps.mainSteps.verifyBasketProducts([cardProductModel]);
+
+    await steps.mainSteps.clickGoToBasket();
+    await steps.basketSteps.verifyBasketPageVisible();
+  });
+
+  test("Open basket with 9 promotional items of the same name", async () => {
+    const mainPage = new MainPage(page);
+  });
+
+  test("Open basket with 9 discount items of the same name", async () => {
+    await steps.mainSteps.setDiscountFilter(true);
+    const countToBuy = 9;
+    const discountProduct = await steps.mainSteps.findProduct(true, countToBuy);
+    const cardProductModel = await steps.mainSteps.buyProduct(
+      discountProduct,
+      countToBuy
+    );
+    await steps.mainSteps.verifyBasketProductsCount(countToBuy);
 
     await steps.mainSteps.openBasketPopup();
     await steps.mainSteps.verifyBasketProducts([cardProductModel]);

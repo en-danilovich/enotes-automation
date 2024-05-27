@@ -32,16 +32,23 @@ export class MainSteps {
     await basketPopup.openBasket();
   }
 
-  async findProductWithoutDiscount(): Promise<ProductCard> {
+  async findProduct(
+    hasDiscount: boolean,
+    countToBy: number = 1
+  ): Promise<ProductCard> {
     const mainPage = new MainPage(this.page);
-    const product = await mainPage.findNonDiscountProduct();
+    const product = await mainPage.findProduct(hasDiscount, countToBy);
     return product;
   }
 
-  async buyProduct(product: ProductCard): Promise<ProductCardModel> {
+  async buyProduct(
+    product: ProductCard,
+    countToBy: number = 1
+  ): Promise<ProductCardModel> {
     await product.buyButton.focus();
+    await product.countInput.fill(countToBy.toString());
     await product.buyButton.click();
-    const model = await product.convertToModel();
+    const model = await product.convertToModel(countToBy);
     return model;
   }
 
@@ -54,6 +61,7 @@ export class MainSteps {
 
   async verifyBasketProducts(expectedProducts: ProductCardModel[]) {
     const basketPopup = new BasketPopup(this.page);
+    await basketPopup.verifyBasketVisible();
     // TODO verify common product count equals to expected
     expectedProducts.forEach(
       async (el) => await this.verifyProductInBasket(el)
@@ -64,9 +72,15 @@ export class MainSteps {
   async verifyProductInBasket(expectedProduct: ProductCardModel) {
     const basketItem = new BasketItem(this.page, expectedProduct.id.toString());
     await expect(basketItem.itemTitle).toHaveText(expectedProduct.productName!);
-    // TODO probably add regex
     expect(await basketItem.getItemPrice()).toBe(expectedProduct.price);
-    await expect(basketItem.itemCount).toHaveText("1");
+    await expect(basketItem.itemCount).toHaveText(
+      expectedProduct.count.toString()
+    );
+  }
+
+  async setDiscountFilter(checked: boolean) {
+    const mainPage = new MainPage(this.page);
+    await mainPage.discountFilterCheckBox.setChecked(checked);
   }
 
   private async verifyCommonBasketPrice(
@@ -74,7 +88,7 @@ export class MainSteps {
     expectedProducts: ProductCardModel[]
   ) {
     const commonPrice = expectedProducts.reduce(
-      (acc, product) => (acc += product.price),
+      (acc, product) => (acc += product.price * product.count),
       0
     );
     await expect(basketPopup.basketPrice).toHaveText(commonPrice.toString());

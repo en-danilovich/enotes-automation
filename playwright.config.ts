@@ -22,7 +22,8 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 1 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [["html", { open: "never" }], ["allure-playwright"]],
+  // reporter: [["html", { open: "never" }], ["allure-playwright"]],
+  reporter: [["html"], ["allure-playwright"]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -30,6 +31,9 @@ export default defineConfig({
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     navigationTimeout: 2000,
+    launchOptions: {
+      args: ["--start-fullscreen"],
+    },
   },
 
   /* Configure projects for major browsers */
@@ -42,7 +46,12 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: "storageStates/auth/testUser.json",
+        launchOptions: {
+          args: ["--start-fullscreen"], // starting the browser in full screen
+          // slowMo: 1000, // a 1000 milliseconds pause before each operation. Useful for slow systems.
+        },
+
+        // storageState: "storageStates/auth/testUser.json",
       },
       dependencies: ["setup"],
     },

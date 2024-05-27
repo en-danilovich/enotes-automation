@@ -15,6 +15,7 @@ export class ProductCard {
   readonly productType: Locator;
   readonly productName: Locator;
   readonly productPrice: Locator;
+  readonly countInput: Locator;
   readonly buyButton: Locator;
 
   constructor(page: Page, productId: string) {
@@ -26,6 +27,7 @@ export class ProductCard {
     this.productType = this.productLocator.locator(".product_type");
     this.productName = this.productLocator.locator(".product_name");
     this.productPrice = this.productLocator.locator(".product_price");
+    this.countInput = this.productLocator.locator("input[type='text']");
     this.buyButton = this.productLocator.locator(".actionBuyProduct");
   }
 
@@ -33,7 +35,7 @@ export class ProductCard {
     await this.buyButton.click();
   }
 
-  async convertToModel(): Promise<ProductCardModel> {
+  async convertToModel(countToBuy: number = 1): Promise<ProductCardModel> {
     const productType = await this.productType.textContent();
     const productName = await this.productName.textContent();
     const productPrice = await this.productPrice.textContent();
@@ -43,7 +45,8 @@ export class ProductCard {
       productType: productType,
       productName: productName,
       price: parseInt(productPrice!),
-      count: 1,
+      // TODO : Add actual and general count
+      count: countToBuy,
     };
     return productModel;
   }
