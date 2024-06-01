@@ -6,6 +6,7 @@ export class EnotesRestApiBase extends RestApiBase {
   protected header: {
     accept: string;
     "X-Requested-With": string;
+    "Content-Type": string;
   };
 
   readonly tokenHelper: TokenHelper;
@@ -16,6 +17,7 @@ export class EnotesRestApiBase extends RestApiBase {
     this.header = {
       accept: "application/json, text/javascript, */*; q=0.01",
       "X-Requested-With": "XMLHttpRequest",
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
     };
   }
 
@@ -25,7 +27,7 @@ export class EnotesRestApiBase extends RestApiBase {
 
   async validateResponse(resp: APIResponse) {
     if (!resp.ok()) {
-      throw Error(await this.parseResponseInfo(resp));
+      throw new Error(await this.parseResponseInfo(resp));
     }
   }
 }

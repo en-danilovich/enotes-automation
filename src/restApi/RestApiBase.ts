@@ -18,7 +18,7 @@ export class RestApiBase {
 
   protected async validateResponse(response: APIResponse) {
     if (!response.ok()) {
-      throw Error(await this.parseResponseInfo(response));
+      throw new Error(await this.parseResponseInfo(response));
     }
   }
 }

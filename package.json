@@ -10,6 +10,8 @@
   "author": "Eugene Danilovich",
   "license": "ISC",
   "devDependencies": {
+    "@automapper/core": "^8.8.1",
+    "@automapper/pojos": "^8.8.1",
     "@playwright/test": "^1.44.0",
     "@types/node": "^20.12.12",
     "allure-commandline": "^2.29.0",

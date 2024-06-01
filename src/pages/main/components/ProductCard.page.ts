@@ -1,12 +1,17 @@
 import { Locator, Page } from "@playwright/test";
 
-export type ProductCardModel = {
+export interface Product {
   id: number;
-  productType: string | null;
-  productName: string | null;
+  type: string;
+  name: string;
   price: number;
+  discountPrice: number;
   count: number;
-};
+}
+
+export interface BasketProduct extends Product {
+  basketCount: number;
+}
 
 export class ProductCard {
   readonly page: Page;
@@ -16,6 +21,7 @@ export class ProductCard {
   readonly productName: Locator;
   readonly productPrice: Locator;
   readonly countInput: Locator;
+  readonly productCount: Locator;
   readonly buyButton: Locator;
 
   constructor(page: Page, productId: string) {
@@ -27,7 +33,10 @@ export class ProductCard {
     this.productType = this.productLocator.locator(".product_type");
     this.productName = this.productLocator.locator(".product_name");
     this.productPrice = this.productLocator.locator(".product_price");
-    this.countInput = this.productLocator.locator("input[type='text']");
+    this.countInput = this.productLocator.locator(
+      "[name='product-enter-count']"
+    );
+    this.productCount = this.productLocator.locator(".product_count");
     this.buyButton = this.productLocator.locator(".actionBuyProduct");
   }
 
@@ -35,19 +44,38 @@ export class ProductCard {
     await this.buyButton.click();
   }
 
-  async convertToModel(countToBuy: number = 1): Promise<ProductCardModel> {
+  async convertToModel(countToBuy: number = 1): Promise<BasketProduct> {
     const productType = await this.productType.textContent();
     const productName = await this.productName.textContent();
     const productPrice = await this.productPrice.textContent();
+    const productCount = await this.productCount.textContent();
 
-    const productModel: ProductCardModel = {
+    const [discountPrice, regularPrice] = this.parsePrice(productPrice!);
+
+    return {
       id: this.productId,
-      productType: productType,
-      productName: productName,
-      price: parseInt(productPrice!),
-      // TODO : Add actual and general count
-      count: countToBuy,
+      type: productType!,
+      name: productName!,
+      price: regularPrice,
+      discountPrice: discountPrice,
+      count: parseInt(productCount!),
+      basketCount: countToBuy,
     };
-    return productModel;
+  }
+
+  private parsePrice(priceString: string): number[] {
+    const priceRegex = /(\d+)\sр/g;
+    const prices = [];
+
+    let match;
+    while ((match = priceRegex.exec(priceString)) !== null) {
+      prices.push(parseInt(match[1], 10));
+    }
+
+    if (prices.length === 1) {
+      prices.unshift(0);
+    }
+
+    return prices;
   }
 }

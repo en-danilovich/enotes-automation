@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import { HeaderPage } from "./Header.page";
 import { ProductCard } from "./components/ProductCard.page";
 
@@ -22,17 +22,8 @@ export class MainPage extends HeaderPage {
     hasDiscount: boolean,
     countToBy: number = 1
   ): Promise<ProductCard> {
-    const lastPage = await this.page
-      .locator("ul.pagination > li:last-child > .page-link")
-      .getAttribute("data-page-number");
-    const pagesCount = parseInt(lastPage!);
-
+    const pagesCount = await this.getPagesCount();
     let productCard;
-    // const elementCount = await this.page.$$eval(
-    //   ".note-item.card",
-    //   (elements) => elements.length
-    // );
-    // expect(elementCount).toBeGreaterThan(1);
 
     let activePageNum = 1;
     while (activePageNum <= pagesCount) {
@@ -50,7 +41,9 @@ export class MainPage extends HeaderPage {
       }
 
       activePageNum++;
-      await this.switchActivePage(activePageNum);
+      if (activePageNum != pagesCount) {
+        await this.switchActivePage(activePageNum);
+      }
     }
 
     if (!productCard) {
@@ -65,10 +58,19 @@ export class MainPage extends HeaderPage {
   }
 
   async switchActivePage(pageNumber: number) {
-    this.page.locator(`.page-link[data-page-number="${pageNumber}`);
+    await this.page
+      .locator(`.page-link[data-page-number='${pageNumber}']`)
+      .click();
   }
 
-  async addCountFilter(element: Locator, expectedCount: number) {
+  async getPagesCount() {
+    const lastPage = await this.page
+      .locator("ul.pagination > li:last-child > .page-link")
+      .getAttribute("data-page-number");
+    return parseInt(lastPage!);
+  }
+
+  private async addCountFilter(element: Locator, expectedCount: number) {
     if (expectedCount > 1) {
       const countNumbers = await this.getProductsCount(expectedCount);
       const regex = new RegExp(`^(${countNumbers.join("|")})$`);
@@ -84,7 +86,7 @@ export class MainPage extends HeaderPage {
     return elements[randomIndex];
   }
 
-  async getProductsCount(expectedCount: number) {
+  private async getProductsCount(expectedCount: number) {
     const spans = await this.page.$$eval(
       "span.product_count",
       (spans, expectedCount) => {

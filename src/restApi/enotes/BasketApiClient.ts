@@ -2,7 +2,7 @@ import { BrowserContext } from "@playwright/test";
 import { EnotesRestApiBase } from "./EnotesRestApiBase";
 import { TokenHelper } from "./TokenHelper";
 
-export type ClearResponseModel = {
+export type ClearBasketResponseModel = {
   response: boolean;
 };
 
@@ -14,10 +14,24 @@ export class BasketApiClient extends EnotesRestApiBase {
     this.baseURL = "https://enotes.pointschool.ru/basket/";
   }
 
-  async clearBasket(): Promise<ClearResponseModel> {
+  async clearBasket(): Promise<ClearBasketResponseModel> {
     const headers = this.getHeaders(await this.tokenHelper.getToken());
-    const resp = await this.request.get(`${this.baseURL}clear`, {
+    const resp = await this.request.post(`${this.baseURL}clear`, {
       headers: headers,
+    });
+    this.validateResponse(resp);
+
+    return resp.json();
+  }
+
+  async addItemToBasket(
+    productId: number,
+    count: number
+  ): Promise<ClearBasketResponseModel> {
+    const headers = this.getHeaders(await this.tokenHelper.getToken());
+    const resp = await this.request.post(`${this.baseURL}create`, {
+      headers: headers,
+      data: `product=${productId}&count=${count}`,
     });
     this.validateResponse(resp);
 
