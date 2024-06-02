@@ -26,4 +26,8 @@ export class BasketPopup {
   async openBasket() {
     await this.openBasketButton.click();
   }
+
+  async getBasketItemsCount() {
+    return await this.basketPopup.locator("li.basket-item").count();
+  }
 }

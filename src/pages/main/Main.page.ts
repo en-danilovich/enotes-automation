@@ -73,7 +73,9 @@ export class MainPage extends HeaderPage {
 
   private async addCountFilter(element: Locator, expectedCount: number) {
     if (expectedCount > 1) {
-      const countNumbers = await this.getProductsCount(expectedCount);
+      const countNumbers = await this.getProductsCountGreaterThanOrEquals(
+        expectedCount
+      );
       const regex = new RegExp(`^(${countNumbers.join("|")})$`);
       return element.filter({
         has: this.page.locator(".product_count", { hasText: regex }),
@@ -82,7 +84,10 @@ export class MainPage extends HeaderPage {
     return element;
   }
 
-  private async getProductsCount(expectedCount: number) {
+  // method returns array of products count, if count >= expectedCount
+  // example: init products with count[12, 20, 35, 40, 50]
+  // expectedCount -> 35, return [35, 40, 50]
+  private async getProductsCountGreaterThanOrEquals(expectedCount: number) {
     const spans = await this.page.$$eval(
       "span.product_count",
       (spans, expectedCount) => {

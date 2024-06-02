@@ -1,6 +1,5 @@
 import { Locator, Page } from "@playwright/test";
 
-// TODO: fix code style + file naming convention
 export abstract class BasePage {
   protected page: Page;
 
@@ -13,6 +12,6 @@ export abstract class BasePage {
   }
 
   async waitForElementBeVisible(locator: Locator) {
-    await locator.waitFor({ state: "visible" });
+    await locator.waitFor({ state: "visible", timeout: 3000 });
   }
 }

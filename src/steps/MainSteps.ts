@@ -2,7 +2,7 @@ import { Page, expect } from "@playwright/test";
 import { BasketPopup } from "../pages/main/components/BasketPopup.page";
 import { MainPage } from "../pages/main/Main.page";
 import {
-  BasketProduct,
+  BasketProductModel,
   ProductCard,
 } from "../pages/main/components/ProductCard.page";
 import { BasketItem } from "../pages/main/components/BasketItem.page";
@@ -41,7 +41,15 @@ export class MainSteps {
   async clickGoToBasket() {
     await allure.step("Click go to basket button", async () => {
       const basketPopup = new BasketPopup(this.page);
-      await basketPopup.openBasket();
+
+      await Promise.all([
+        this.page.waitForResponse(
+          (response) =>
+            response.url() === `${process.env.API_URL}basket` &&
+            response.status() == 200
+        ),
+        basketPopup.openBasket(),
+      ]);
     });
   }
 
@@ -62,8 +70,8 @@ export class MainSteps {
   async buyProduct(
     product: ProductCard,
     countToBy: number = 1
-  ): Promise<BasketProduct> {
-    return await allure.step<BasketProduct>(
+  ): Promise<BasketProductModel> {
+    return await allure.step<BasketProductModel>(
       `Buy product: productId=${product.productId}, countToBuy=${countToBy}`,
       async () => {
         await product.countInput.waitFor();
@@ -76,11 +84,13 @@ export class MainSteps {
     );
   }
 
-  async buyDifferentProducts(productsCount: number): Promise<BasketProduct[]> {
-    return await allure.step<BasketProduct[]>(
+  async buyDifferentProducts(
+    productsCount: number
+  ): Promise<BasketProductModel[]> {
+    return await allure.step<BasketProductModel[]>(
       `Buy ${productsCount} different products`,
       async () => {
-        let resultProducts: BasketProduct[] = [];
+        let resultProducts: BasketProductModel[] = [];
         const mainPage = new MainPage(this.page);
         const pagesCount = await mainPage.getPagesCount();
 
@@ -131,19 +141,24 @@ export class MainSteps {
     });
   }
 
-  async verifyBasketProducts(expectedProducts: BasketProduct[]) {
+  async verifyBasketProducts(expectedProducts: BasketProductModel[]) {
     await allure.step("Verify basket products count", async () => {
       const basketPopup = new BasketPopup(this.page);
       await basketPopup.verifyBasketVisible();
-      // TODO verify common product count equals to expected
       expectedProducts.forEach(
         async (el) => await this.verifyProductInBasket(el)
       );
+      expect
+        .soft(
+          await basketPopup.getBasketItemsCount(),
+          "Verify basket items count"
+        )
+        .toEqual(expectedProducts.length);
       await this.verifyGeneralBasketPrice(basketPopup, expectedProducts);
     });
   }
 
-  async verifyProductInBasket(expectedProduct: BasketProduct) {
+  async verifyProductInBasket(expectedProduct: BasketProductModel) {
     await allure.step(
       `Verify product in basket: productId=${expectedProduct.id}`,
       async () => {
@@ -173,7 +188,7 @@ export class MainSteps {
 
   private async verifyGeneralBasketPrice(
     basketPopup: BasketPopup,
-    expectedProducts: BasketProduct[]
+    expectedProducts: BasketProductModel[]
   ) {
     await allure.step(`Verify general basket price`, async () => {
       const commonPrice = expectedProducts.reduce(

@@ -1,6 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 
-export interface Product {
+export interface ProductModel {
   id: number;
   type: string;
   name: string;
@@ -9,7 +9,7 @@ export interface Product {
   count: number;
 }
 
-export interface BasketProduct extends Product {
+export interface BasketProductModel extends ProductModel {
   basketCount: number;
 }
 
@@ -44,7 +44,7 @@ export class ProductCard {
     await this.buyButton.click();
   }
 
-  async convertToModel(countToBuy: number = 1): Promise<BasketProduct> {
+  async convertToModel(countToBuy: number = 1): Promise<BasketProductModel> {
     const productType = await this.productType.textContent();
     const productName = await this.productName.textContent();
     const productPrice = await this.productPrice.textContent();

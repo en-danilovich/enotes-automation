@@ -6,7 +6,7 @@ import {
   Mapper,
 } from "@automapper/core";
 import { Product as ApiProduct } from "../restApi/enotes/ProductsApiClient";
-import { BasketProduct as UIProduct } from "../pages/main/components/ProductCard.page";
+import { BasketProductModel as UIProduct } from "../pages/main/components/ProductCard.page";
 import { pojos, PojosMetadataMap } from "@automapper/pojos";
 
 export class ModelMapper {

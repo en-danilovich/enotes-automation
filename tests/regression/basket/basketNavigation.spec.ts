@@ -24,7 +24,7 @@ test.beforeAll(async ({ enotesContext }) => {
 
 test.beforeEach(async () => {
   await page.goto("./");
-  await apiActions.basketApiClient.clearBasket();
+  await apiActions.clearBasket();
   await page.reload({ waitUntil: "domcontentloaded" });
   await steps.mainSteps.waitForMainPageToBeLoaded();
 });

@@ -12,9 +12,9 @@ require("dotenv").config();
 export default defineConfig({
   testDir: "./tests",
   /* Maximum time one test can run for. */
-  timeout: 60 * 1000,
+  timeout: 30 * 1000,
   expect: {
-    timeout: 5000,
+    timeout: 3000,
   },
   fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */

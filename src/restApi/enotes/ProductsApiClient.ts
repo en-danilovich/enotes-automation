@@ -16,6 +16,8 @@ export type GetProductsResponse = {
   response: boolean;
   error: string;
   products: Product[];
+  page: number;
+  pages: number;
 };
 
 export class ProductsApiClient extends EnotesRestApiBase {
@@ -27,12 +29,13 @@ export class ProductsApiClient extends EnotesRestApiBase {
   }
 
   async getProducts(
-    hasDiscount: boolean = false
+    hasDiscount: boolean = false,
+    page: number = 1
   ): Promise<GetProductsResponse> {
     const headers = this.getHeaders(await this.tokenHelper.getToken());
     const resp = await this.request.post(`${this.productsApiUrl}get`, {
       headers: headers,
-      form: { filters: `is-discount=${hasDiscount ? "on" : ""}` },
+      form: { filters: `is-discount=${hasDiscount ? "on" : ""}`, page: page },
     });
     this.validateResponse(resp);
 
