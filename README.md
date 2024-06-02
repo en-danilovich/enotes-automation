@@ -9,8 +9,8 @@
 3. Install playwright dependencies:
    `npx playwright install`
 4. Create .env file in root folder and specify values:
-   - `BASE_URL` (format: 'https://domain/)
-   - `API_URL` (format: 'https://domain/)
+   - `BASE_URL` (format: 'https://domain/) -> https://enotes.pointschool.ru/
+   - `API_URL` (format: 'https://domain/) -> https://enotes.pointschool.ru/
    - `USER_NAME`
    - `USER_PASSWORD`
 
