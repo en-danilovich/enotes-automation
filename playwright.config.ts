@@ -4,7 +4,7 @@ import { defineConfig, devices } from "@playwright/test";
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-// require('dotenv').config();
+require("dotenv").config();
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -23,11 +23,14 @@ export default defineConfig({
   workers: process.env.CI ? 1 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   // reporter: [["html", { open: "never" }], ["allure-playwright"]],
-  reporter: [["html"], ["allure-playwright"]],
+  reporter: [
+    ["html", { open: "never" }],
+    ["allure-playwright", { environmentInfo: { url: process.env.BASE_URL } }],
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: "https://enotes.pointschool.ru",
+    baseURL: process.env.BASE_URL,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     navigationTimeout: 2000,
@@ -47,24 +50,9 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         launchOptions: {
-          args: ["--start-fullscreen"], // starting the browser in full screen
-          // slowMo: 1000, // a 1000 milliseconds pause before each operation. Useful for slow systems.
+          args: ["--start-fullscreen"],
         },
-
-        // storageState: "storageStates/auth/testUser.json",
       },
-      dependencies: ["setup"],
-    },
-
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-      dependencies: ["setup"],
-    },
-
-    {
-      name: "webkit",
-      use: { ...devices["Desktop Safari"] },
       dependencies: ["setup"],
     },
   ],

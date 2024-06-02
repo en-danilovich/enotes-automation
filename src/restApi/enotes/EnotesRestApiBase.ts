@@ -3,13 +3,14 @@ import { RestApiBase } from "../RestApiBase";
 import { TokenHelper } from "./TokenHelper";
 
 export class EnotesRestApiBase extends RestApiBase {
+  readonly baseURL: string = process.env.API_URL!;
+  readonly tokenHelper: TokenHelper;
+
   protected header: {
     accept: string;
     "X-Requested-With": string;
     "Content-Type": string;
   };
-
-  readonly tokenHelper: TokenHelper;
 
   constructor(browserContext: BrowserContext, tokenHelper: TokenHelper) {
     super(browserContext);

@@ -4,7 +4,7 @@ import {
   BrowserContext,
 } from "@playwright/test";
 
-export class RestApiBase {
+export abstract class RestApiBase {
   readonly request: APIRequestContext;
 
   constructor(browserContext: BrowserContext) {

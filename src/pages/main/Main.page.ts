@@ -1,8 +1,9 @@
-import { Locator, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 import { HeaderPage } from "./Header.page";
 import { ProductCard } from "./components/ProductCard.page";
 
 export class MainPage extends HeaderPage {
+  readonly pageUrl: string = "https://enotes.pointschool.ru";
   readonly noteFilters: Locator;
   readonly discountFilterCheckBox: Locator;
 
@@ -13,10 +14,9 @@ export class MainPage extends HeaderPage {
   }
 
   async waitForPageToBeVisible() {
+    await expect(this.page).toHaveURL(this.pageUrl);
     await super.waitForElementBeVisible(this.noteFilters);
   }
-
-  // TODO: add url verification
 
   async findProduct(
     hasDiscount: boolean,

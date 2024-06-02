@@ -15,21 +15,15 @@ export class BasketPopup {
     });
   }
 
-  // TODO user different extends class not Page
-  // async waitForPopupToBeVisible() {
-  //   await super.waitForElementBeVisible(this.basketPopup);
-  // }
-
   async focus() {
     await this.basketPopup.focus();
   }
 
   async verifyBasketVisible() {
-    await expect(this.basketPopup).toBeVisible();
+    await expect(this.basketPopup, "Basket popup is visible").toBeVisible();
   }
 
   async openBasket() {
     await this.openBasketButton.click();
-    // return new BasketPage(this.page);
   }
 }

@@ -7,16 +7,16 @@ export type ClearBasketResponseModel = {
 };
 
 export class BasketApiClient extends EnotesRestApiBase {
-  readonly baseURL: string;
+  readonly basketApiUrl: string;
 
   constructor(browserContext: BrowserContext, tokenHelper: TokenHelper) {
     super(browserContext, tokenHelper);
-    this.baseURL = "https://enotes.pointschool.ru/basket/";
+    this.basketApiUrl = this.baseURL + "basket/";
   }
 
   async clearBasket(): Promise<ClearBasketResponseModel> {
     const headers = this.getHeaders(await this.tokenHelper.getToken());
-    const resp = await this.request.post(`${this.baseURL}clear`, {
+    const resp = await this.request.post(`${this.basketApiUrl}clear`, {
       headers: headers,
     });
     this.validateResponse(resp);
@@ -29,7 +29,7 @@ export class BasketApiClient extends EnotesRestApiBase {
     count: number
   ): Promise<ClearBasketResponseModel> {
     const headers = this.getHeaders(await this.tokenHelper.getToken());
-    const resp = await this.request.post(`${this.baseURL}create`, {
+    const resp = await this.request.post(`${this.basketApiUrl}create`, {
       headers: headers,
       data: `product=${productId}&count=${count}`,
     });

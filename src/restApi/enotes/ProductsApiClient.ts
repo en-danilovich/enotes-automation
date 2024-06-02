@@ -19,18 +19,18 @@ export type GetProductsResponse = {
 };
 
 export class ProductsApiClient extends EnotesRestApiBase {
-  readonly baseURL: string;
+  readonly productsApiUrl: string;
 
   constructor(browserContext: BrowserContext, tokenHelper: TokenHelper) {
     super(browserContext, tokenHelper);
-    this.baseURL = "https://enotes.pointschool.ru/product/";
+    this.productsApiUrl = this.baseURL + "product/";
   }
 
   async getProducts(
     hasDiscount: boolean = false
   ): Promise<GetProductsResponse> {
     const headers = this.getHeaders(await this.tokenHelper.getToken());
-    const resp = await this.request.post(`${this.baseURL}get`, {
+    const resp = await this.request.post(`${this.productsApiUrl}get`, {
       headers: headers,
       form: { filters: `is-discount=${hasDiscount ? "on" : ""}` },
     });
