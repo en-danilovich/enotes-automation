@@ -1,7 +1,6 @@
 import { Locator, Page } from "@playwright/test";
 
 // TODO: fix code style + file naming convention
-// TODO: probably change to base element or something but not page
 export abstract class BasePage {
   protected page: Page;
 

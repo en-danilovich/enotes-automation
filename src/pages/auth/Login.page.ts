@@ -3,7 +3,7 @@ import { BasePage } from "../Base.page";
 import { allure } from "allure-playwright";
 
 export class LoginPage extends BasePage {
-  readonly pageUrl: string = "https://enotes.pointschool.ru/login";
+  readonly pageUrl: string = `${process.env.BASE_URL}login`;
   readonly usernameInput: Locator;
   readonly passwordInput: Locator;
   readonly loginButton: Locator;
@@ -15,8 +15,11 @@ export class LoginPage extends BasePage {
     this.loginButton = page.getByRole("button", { name: "Вход" });
   }
 
+  async navigate() {
+    await this.page.goto(this.pageUrl);
+  }
+
   async waitForPageToBeVisible() {
-    // TODO get from .env
     await expect(this.page).toHaveURL(this.pageUrl);
     await super.waitForElementBeVisible(this.loginButton);
   }

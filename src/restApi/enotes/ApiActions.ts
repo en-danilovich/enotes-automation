@@ -17,6 +17,7 @@ export class ApiActions {
     hasDiscount: boolean,
     basketCount: number
   ): Promise<Product> {
+    // TODO: filter by count so basketCount can not be greater than actual count
     const products = (await this.productsApiClient.getProducts(hasDiscount))
       .products;
     const product = getRandomElement(products);

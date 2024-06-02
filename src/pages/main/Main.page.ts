@@ -1,9 +1,10 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { HeaderPage } from "./Header.page";
 import { ProductCard } from "./components/ProductCard.page";
+import { getRandomElement } from "../../helpers/ArrayHelper";
 
 export class MainPage extends HeaderPage {
-  readonly pageUrl: string = "https://enotes.pointschool.ru";
+  readonly pageUrl: string = process.env.BASE_URL!;
   readonly noteFilters: Locator;
   readonly discountFilterCheckBox: Locator;
 
@@ -34,7 +35,7 @@ export class MainPage extends HeaderPage {
       const elements = await elementLocator.all();
 
       if (elements.length > 0) {
-        const randomElement = this.getRandomProduct(elements);
+        const randomElement = getRandomElement(elements);
         const productId = await randomElement.getAttribute("data-product");
         productCard = new ProductCard(this.page, productId!);
         break;
@@ -79,11 +80,6 @@ export class MainPage extends HeaderPage {
       });
     }
     return element;
-  }
-
-  private getRandomProduct(elements: Locator[]) {
-    const randomIndex = Math.floor(Math.random() * elements.length);
-    return elements[randomIndex];
   }
 
   private async getProductsCount(expectedCount: number) {

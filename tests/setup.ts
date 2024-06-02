@@ -1,25 +1,20 @@
-import { test as setup, expect } from "@playwright/test";
+import { test as setup } from "@playwright/test";
 import { LoginPage } from "../src/pages/auth/Login.page";
+import { chromium } from "@playwright/test";
+import { MainPage } from "../src/pages/main/Main.page";
 
 const authFile = "storageStates/auth/testUser.json";
 
-import { chromium } from "@playwright/test";
-
 setup("setup", async () => {
-  const browser = await chromium.launch({ headless: false });
+  const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
 
-  await page.goto("https://enotes.pointschool.ru/login");
-
   const loginPage = new LoginPage(page);
-  await loginPage.login("test", "test");
+  await loginPage.navigate();
+  await loginPage.login(process.env.USER_NAME!, process.env.USER_PASSWORD!);
 
-  // Wait until the page receives the cookies.
-  //
-  // Sometimes login flow sets cookies in the process of several redirects.
-  // Wait for the final URL to ensure that the cookies are actually set.
-  await page.waitForURL("https://enotes.pointschool.ru");
-  await expect(page.locator("#dropdownUser")).toBeVisible();
+  const mainPage = new MainPage(page);
+  await mainPage.waitForPageToBeVisible();
 
   await page.context().storageState({ path: authFile });
 
