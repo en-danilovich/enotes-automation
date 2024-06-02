@@ -171,7 +171,10 @@ export class MainSteps {
           .toHaveText(expectedProduct.name!);
         expect
           .soft(await basketItem.getItemPrice(), "Verify product price")
-          .toBe(expectedProduct.discountPrice || expectedProduct.price);
+          .toBe(
+            (expectedProduct.discountPrice || expectedProduct.price) *
+              expectedProduct.basketCount
+          );
         await expect
           .soft(basketItem.itemCount, "Verify items count")
           .toHaveText(expectedProduct.basketCount.toString());
